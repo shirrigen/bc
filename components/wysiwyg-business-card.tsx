@@ -158,7 +158,7 @@ const translations = {
     company: '公司',
     email: '邮箱',
     phone: '电话',
-    theme: '主题',
+    theme: '主���',
     backgroundColor: '背景颜色',
     textColor: '文字颜色',
     borderWidth: '边框宽度',
@@ -381,7 +381,7 @@ export function WysiwygBusinessCard() {
   )
 
   return (
-    <div className="pt-16">
+    <div className="pt-0">
       <Card className="w-full max-w-3xl mx-auto bg-card text-card-foreground shadow-lg">
         <CardHeader className="flex flex-row items-center justify-between border-b border-border pb-4">
           <CardTitle className="font-bold">{t.title}</CardTitle>
@@ -396,10 +396,10 @@ export function WysiwygBusinessCard() {
           <div className="flex flex-col items-center mt-8">
             <div 
               id="business-card"
-              className={`p-6 pr-14 rounded-lg shadow-lg ${cardInfo.theme !== 'custom' ? themeStyles[cardInfo.theme].bg : ''} ${cardInfo.theme !== 'custom' ? themeStyles[cardInfo.theme].text : ''} transition-all duration-300 overflow-hidden flex items-center justify-center`}
+              className={`p-6 rounded-lg shadow-lg ${cardInfo.theme !== 'custom' ? themeStyles[cardInfo.theme].bg : ''} ${cardInfo.theme !== 'custom' ? themeStyles[cardInfo.theme].text : ''} transition-all duration-300 overflow-hidden flex flex-col justify-between`}
               style={cardStyle}
             >
-              <div className={`flex flex-col justify-between w-full h-full`}>
+              <div className={`flex flex-col items-center w-full`}>
                 <div className={`flex ${cardInfo.orientation === 'landscape' ? 'flex-row items-center' : 'flex-col items-start'} ${cardInfo.orientation === 'landscape' ? 'space-x-6' : 'space-y-6'} w-full`}>
                   <div className="flex-shrink-0 relative group">
                     <div className="relative">
@@ -435,7 +435,7 @@ export function WysiwygBusinessCard() {
                       className="hidden"
                     />
                   </div>
-                  <div className={`flex flex-col ${cardInfo.orientation === 'portrait' ? 'text-left w-full' : ''}`}>
+                  <div className={`flex flex-col ${cardInfo.orientation === 'portrait' ? 'text-left' : 'text-left'}`}>
                     <h2 className="text-2xl font-bold">{renderEditableField('name')}</h2>
                     <p className="text-lg">{renderEditableField('position')}</p>
                     <p>{renderEditableField('company')}</p>
@@ -443,27 +443,27 @@ export function WysiwygBusinessCard() {
                     <p>{renderEditableField('phone')}</p>
                   </div>
                 </div>
-                {cardInfo.showSocial && (
-                  <div className={`mt-4 pt-4 border-t border-opacity-20 w-full`}>
-                    <div className={`flex flex-wrap gap-2 justify-start`}>
-                      {cardInfo.socialMedia.map((sm) => 
-                        sm.username && (
-                          <a 
-                            key={sm.platform} 
-                            href={`https://${sm.platform}.com/${sm.username}`} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className={`flex items-center space-x-1 px-2 py-1 rounded border border-current text-current`}
-                          >
-                            {sm.icon}
-                            <span>{sm.username}</span>
-                          </a>
-                        )
-                      )}
-                    </div>
-                  </div>
-                )}
               </div>
+              {cardInfo.showSocial && (
+                <div className={`mt-4 pt-4 border-t border-opacity-20 w-full`}>
+                  <div className={`flex flex-wrap gap-2 justify-start`}>
+                    {cardInfo.socialMedia.map((sm) => 
+                      sm.username && (
+                        <a 
+                          key={sm.platform} 
+                          href={`https://${sm.platform}.com/${sm.username}`} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className={`flex items-center space-x-1 px-2 py-1 rounded border border-current text-current`}
+                        >
+                          {sm.icon}
+                          <span>{sm.username}</span>
+                        </a>
+                      )
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
             
             <div className="mt-4">
