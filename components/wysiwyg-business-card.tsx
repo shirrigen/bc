@@ -399,7 +399,7 @@ export function WysiwygBusinessCard() {
               className={`p-6 pr-14 rounded-lg shadow-lg ${cardInfo.theme !== 'custom' ? themeStyles[cardInfo.theme].bg : ''} ${cardInfo.theme !== 'custom' ? themeStyles[cardInfo.theme].text : ''} transition-all duration-300 overflow-hidden flex items-center justify-center`}
               style={cardStyle}
             >
-              <div className={`flex ${cardInfo.orientation === 'landscape' ? 'flex-row items-center' : 'flex-col items-start'} justify-center w-full h-full`}>
+              <div className={`flex flex-col justify-between w-full h-full`}>
                 <div className={`flex ${cardInfo.orientation === 'landscape' ? 'flex-row items-center' : 'flex-col items-start'} ${cardInfo.orientation === 'landscape' ? 'space-x-6' : 'space-y-6'} w-full`}>
                   <div className="flex-shrink-0 relative group">
                     <div className="relative">
@@ -408,7 +408,7 @@ export function WysiwygBusinessCard() {
                         alt="个人头像或公司logo"
                         width={96}
                         height={96}
-                        className="w-24 h-24 rounded-full object-cover"
+                        className="w-20 h-20 rounded-full object-cover"
                       />
                       {cardInfo.imageUrl !== '/default-avatar.png' && (
                         <button
@@ -444,8 +444,8 @@ export function WysiwygBusinessCard() {
                   </div>
                 </div>
                 {cardInfo.showSocial && (
-                  <div className={`mt-4 pt-4 border-t border-opacity-20 ${cardInfo.orientation === 'portrait' ? 'w-full' : ''}`}>
-                    <div className={`flex flex-wrap gap-2 ${cardInfo.orientation === 'portrait' ? 'justify-start' : 'justify-center'}`}>
+                  <div className={`mt-4 pt-4 border-t border-opacity-20 w-full`}>
+                    <div className={`flex flex-wrap gap-2 justify-start`}>
                       {cardInfo.socialMedia.map((sm) => 
                         sm.username && (
                           <a 
