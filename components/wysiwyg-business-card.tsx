@@ -40,17 +40,17 @@ type CardInfo = {
 }
 
 const initialCardInfo: CardInfo = {
-  name: 'John Doe',
-  position: 'Software Engineer',
-  company: 'Tech Corp',
-  email: 'john@techcorp.com',
+  name: 'Joe Dove',
+  position: 'VP',
+  company: 'Fashion Corp',
+  email: 'joe.dove@facorp.com',
   phone: '+1 (555) 123-4567',
-  theme: 'modern',
-  backgroundColor: '#ffffff',
-  textColor: '#000000',
-  borderWidth: 0,
-  borderColor: '#000000',
-  imageUrl: '',
+  theme: 'custom',
+  backgroundColor: '#f0f0f0',
+  textColor: '#ccddff',
+  borderWidth: 2,
+  borderColor: '#0f00db',
+  imageUrl: '/default-avatar.png',
   font: 'Inter',
   showSocial: false,
   socialMedia: [
@@ -61,7 +61,7 @@ const initialCardInfo: CardInfo = {
     { platform: 'chat', username: '', icon: <Chat fontSize="small" /> },
   ],
   orientation: 'landscape',
-  backgroundImageUrl: ''
+  backgroundImageUrl: '/default-background.gif'
 }
 
 const themeStyles: Record<CardTheme, { 
@@ -221,10 +221,11 @@ export function WysiwygBusinessCard() {
       setCardInfo(prev => ({
         ...prev,
         theme,
-        backgroundColor: '#ffffff',
-        textColor: '#000000',
-        borderColor: '#000000',
-        borderWidth: 0,
+        backgroundColor: '#f0f0f0',
+        textColor: '#333333',
+        borderWidth: 2,
+        borderColor: '#666666',
+        backgroundImageUrl: '/default-background.gif',
       }))
     } else {
       setCardInfo(prev => ({ 
@@ -275,7 +276,7 @@ export function WysiwygBusinessCard() {
   }
 
   const handleImageDelete = () => {
-    setCardInfo(prev => ({ ...prev, imageUrl: '' }))
+    setCardInfo(prev => ({ ...prev, imageUrl: '/default-avatar.png' }))
   }
 
   const toggleOrientation = () => {
@@ -316,8 +317,8 @@ export function WysiwygBusinessCard() {
     width: cardInfo.orientation === 'landscape' ? '90vw' : '54vw',
     maxWidth: cardInfo.orientation === 'landscape' ? '450px' : '270px',
     aspectRatio: cardInfo.showSocial ? 'auto' : (cardInfo.orientation === 'landscape' ? '90 / 54' : '54 / 90'),
-    backgroundColor: cardInfo.theme === 'custom' ? cardInfo.backgroundColor : undefined,
-    color: cardInfo.theme === 'custom' ? cardInfo.textColor : undefined,
+    backgroundColor: cardInfo.backgroundColor,
+    color: cardInfo.textColor,
     borderWidth: `${cardInfo.borderWidth}px`,
     borderColor: cardInfo.borderColor,
     borderStyle: cardInfo.borderWidth > 0 ? 'solid' : 'none',
@@ -374,15 +375,15 @@ export function WysiwygBusinessCard() {
             >
               <div className={`flex ${cardInfo.orientation === 'landscape' ? 'flex-row items-start' : 'flex-col items-center'} justify-center ${cardInfo.orientation === 'landscape' ? 'space-x-6' : 'space-y-6'}`}>
                 <div className="flex-shrink-0 relative group">
-                  {cardInfo.imageUrl ? (
-                    <div className="relative">
-                      <Image
-                        src={cardInfo.imageUrl}
-                        alt="个人头像"
-                        width={96}
-                        height={96}
-                        className="w-24 h-24 rounded-full object-cover"
-                      />
+                  <div className="relative">
+                    <Image
+                      src={cardInfo.imageUrl || '/default-avatar.png'} // 使用 || 运算符来提供默认值
+                      alt="个人头像或公司logo"
+                      width={96}
+                      height={96}
+                      className="w-24 h-24 rounded-full object-cover"
+                    />
+                    {cardInfo.imageUrl !== '/default-avatar.png' && ( // 只有当不是默认图片时才显示删除按钮
                       <button
                         onClick={handleImageDelete}
                         className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -390,16 +391,15 @@ export function WysiwygBusinessCard() {
                       >
                         <Close fontSize="small" />
                       </button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={triggerImageUpload}
-                      className={`w-24 h-24 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity bg-gray-200 border-2 border-dashed ${themeStyles[cardInfo.theme].border}`}
-                      aria-label="Upload image"
-                    >
-                      <AddPhotoAlternate fontSize="large" className="text-gray-400" />
-                    </button>
-                  )}
+                    )}
+                  </div>
+                  <button
+                    onClick={triggerImageUpload}
+                    className="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                    aria-label="更换图片"
+                  >
+                    <Edit fontSize="small" />
+                  </button>
                   <input
                     type="file"
                     ref={fileInputRef}
@@ -525,6 +525,7 @@ export function WysiwygBusinessCard() {
                           width={80}
                           height={80}
                           className="w-20 h-20 object-cover rounded"
+                          unoptimized
                         />
                         <button
                           onClick={handleBackgroundImageDelete}
