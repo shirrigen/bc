@@ -42,14 +42,14 @@ type CardInfo = {
 const initialCardInfo: CardInfo = {
   name: 'Joe Dove',
   position: 'VP',
-  company: 'Fashion Corp',
-  email: 'joe.dove@facorp.com',
+  company: 'FirstMeet Corp',
+  email: 'joe.dove@fmcorp.com',
   phone: '+1 (555) 123-4567',
   theme: 'custom',
   backgroundColor: '#f0f0f0',
   textColor: '#ccddff',
   borderWidth: 2,
-  borderColor: '#0f00db',
+  borderColor: '#000000',
   imageUrl: '/default-avatar.png',
   font: 'Inter',
   showSocial: false,
@@ -134,9 +134,8 @@ const translations = {
     font: 'Font',
     showSocial: 'Show Social Media',
     uploadBackground: 'Upload Background',
-    switchOrientation: 'Switch Orientation',
-    landscape: 'Landscape',
-    portrait: 'Portrait',
+    switchToLandscape: 'Switch to Horizontal',
+    switchToPortrait: 'Switch to Vertical',
     saveImage: 'Save Image',
     themes: {
       modern: 'Modern',
@@ -146,6 +145,11 @@ const translations = {
       bold: 'Bold',
       custom: 'Custom',
     },
+    backgroundImageUrl: 'Background Image URL',
+    edit: 'Edit',
+    switchLayout: 'Switch Layout',
+    horizontal: 'Horizontal',
+    vertical: 'Vertical',
   },
   zh: {
     title: '简单名片',
@@ -163,9 +167,8 @@ const translations = {
     font: '字体',
     showSocial: '显示社交媒体',
     uploadBackground: '上传背景',
-    switchOrientation: '切换方向',
-    landscape: '横向',
-    portrait: '纵向',
+    switchToLandscape: '切换横版',
+    switchToPortrait: '切换竖版',
     saveImage: '保存图片',
     themes: {
       modern: '现代',  
@@ -175,6 +178,11 @@ const translations = {
       bold: '大胆',
       custom: '自定义',
     },
+    backgroundImageUrl: '背景图片链接',
+    edit: '编辑',
+    switchLayout: '切换版式',
+    horizontal: '横版',
+    vertical: '竖版',
   }
 }
 
@@ -225,16 +233,27 @@ export function WysiwygBusinessCard() {
         textColor: '#333333',
         borderWidth: 2,
         borderColor: '#666666',
-        backgroundImageUrl: 'https://example.com/your-embed-gif.gif',
+        backgroundImageUrl: 'https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExbzFxMGJwd2lwaDhqcXFxZmNjaXVjZjk4ZjNzdnJma3k4ZmxocXJtZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/S8ZM7uiGCJVv25rrhc/giphy.gif',
       }))
     } else {
       setCardInfo(prev => ({ 
-        ...prev, 
+        ...initialCardInfo, // 重置为初始状态
         theme,
-        backgroundColor: themeStyles[theme].bg.split('-')[1] || '#ffffff',
-        textColor: themeStyles[theme].text.split('-')[1] || '#000000',
-        borderColor: themeStyles[theme].border.split('-')[1] || '#000000',
-        font: themeStyles[theme].font.split('-')[1] || 'Inter'
+        backgroundColor: '', // 清空自定义背景色
+        textColor: '', // 清空自定义文字颜色
+        borderWidth: 0, // 重置边框宽度
+        borderColor: '', // 清空边框颜色
+        backgroundImageUrl: '', // 清空背景图片
+        font: themeStyles[theme].font.split('-')[1] || 'Inter',
+        // 保留用户的个人信息和社交媒体设置
+        name: prev.name,
+        position: prev.position,
+        company: prev.company,
+        email: prev.email,
+        phone: prev.phone,
+        showSocial: prev.showSocial,
+        socialMedia: prev.socialMedia,
+        orientation: prev.orientation,
       }))
     }
   }
@@ -317,18 +336,20 @@ export function WysiwygBusinessCard() {
     width: cardInfo.orientation === 'landscape' ? '90vw' : '54vw',
     maxWidth: cardInfo.orientation === 'landscape' ? '450px' : '270px',
     aspectRatio: cardInfo.showSocial ? 'auto' : (cardInfo.orientation === 'landscape' ? '90 / 54' : '54 / 90'),
-    backgroundColor: cardInfo.backgroundColor,
-    color: cardInfo.textColor,
-    borderWidth: `${cardInfo.borderWidth}px`,
-    borderColor: cardInfo.borderColor,
-    borderStyle: cardInfo.borderWidth > 0 ? 'solid' : 'none',
+    ...(cardInfo.theme === 'custom' && {
+      backgroundColor: cardInfo.backgroundColor,
+      color: cardInfo.textColor,
+      borderWidth: `${cardInfo.borderWidth}px`,
+      borderColor: cardInfo.borderColor,
+      borderStyle: cardInfo.borderWidth > 0 ? 'solid' : 'none',
+      backgroundImage: cardInfo.backgroundImageUrl ? `url(${cardInfo.backgroundImageUrl})` : undefined,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    }),
     fontFamily: cardInfo.font,
-    backgroundImage: cardInfo.backgroundImageUrl ? `url(${cardInfo.backgroundImageUrl})` : undefined,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
   }
 
-  const renderEditableField = (field: keyof CardInfo, icon?: React.ReactNode) => (
+  const renderEditableField = (field: keyof CardInfo) => (
     <div className="relative group">
       {editingField === field ? (
         <Input
@@ -336,26 +357,31 @@ export function WysiwygBusinessCard() {
           value={cardInfo[field] as string}
           onChange={(e) => handleInputChange(field, e.target.value)}
           onBlur={handleInputBlur}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleInputBlur();
+            }
+          }}
           className="w-full"
         />
       ) : (
-        <>
+        <div className="flex items-center justify-between">
           <span>{typeof cardInfo[field] === 'object' ? JSON.stringify(cardInfo[field]) : cardInfo[field]}</span>
           <Button
             variant="ghost"
-            size="icon"
-            className="absolute -right-8 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+            size="sm"
+            className="absolute -right-10 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
             onClick={() => handleEditClick(field)}
           >
-            {icon || <Edit fontSize="small" />}
+            <Edit fontSize="small" />
           </Button>
-        </>
+        </div>
       )}
     </div>
   )
 
   return (
-    <div className="pt-16"> {/* 添加这个包装 div */}
+    <div className="pt-16">
       <Card className="w-full max-w-3xl mx-auto bg-card text-card-foreground shadow-lg">
         <CardHeader className="flex flex-row items-center justify-between border-b border-border pb-4">
           <CardTitle className="font-bold">{t.title}</CardTitle>
@@ -367,81 +393,83 @@ export function WysiwygBusinessCard() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center mt-8"> {/* 增加这里的 mt-8 类 */}
+          <div className="flex flex-col items-center mt-8">
             <div 
               id="business-card"
-              className={`p-6 rounded-lg shadow-lg ${cardInfo.theme !== 'custom' ? themeStyles[cardInfo.theme].bg : ''} ${cardInfo.theme !== 'custom' ? themeStyles[cardInfo.theme].text : ''} transition-all duration-300 overflow-hidden`}
+              className={`p-6 pr-14 rounded-lg shadow-lg ${cardInfo.theme !== 'custom' ? themeStyles[cardInfo.theme].bg : ''} ${cardInfo.theme !== 'custom' ? themeStyles[cardInfo.theme].text : ''} transition-all duration-300 overflow-hidden flex items-center justify-center`}
               style={cardStyle}
             >
-              <div className={`flex ${cardInfo.orientation === 'landscape' ? 'flex-row items-start' : 'flex-col items-center'} justify-center ${cardInfo.orientation === 'landscape' ? 'space-x-6' : 'space-y-6'}`}>
-                <div className="flex-shrink-0 relative group">
-                  <div className="relative">
-                    <Image
-                      src={cardInfo.imageUrl || '/default-avatar.png'} // 使用 || 运算符来提供默认值
-                      alt="个人头像或公司logo"
-                      width={96}
-                      height={96}
-                      className="w-24 h-24 rounded-full object-cover"
-                    />
-                    {cardInfo.imageUrl !== '/default-avatar.png' && ( // 只有当不是默认图片时才显示删除按钮
-                      <button
-                        onClick={handleImageDelete}
-                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                        aria-label="删除图片"
-                      >
-                        <Close fontSize="small" />
-                      </button>
-                    )}
-                  </div>
-                  <button
-                    onClick={triggerImageUpload}
-                    className="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                    aria-label="更换图片"
-                  >
-                    <Edit fontSize="small" />
-                  </button>
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleImageUpload}
-                    accept="image/*"
-                    className="hidden"
-                  />
-                </div>
-                <div className={`flex-grow space-y-2 ${cardInfo.orientation === 'portrait' ? 'text-center' : ''}`}>
-                  <h2 className="text-2xl font-bold">{renderEditableField('name')}</h2>
-                  <p className="text-lg">{renderEditableField('position')}</p>
-                  <p>{renderEditableField('company')}</p>
-                  <p>{renderEditableField('email')}</p>
-                  <p>{renderEditableField('phone')}</p>
-                </div>
-              </div>
-              {cardInfo.showSocial && (
-                <div className="mt-4 pt-4 border-t border-opacity-20">
-                  <div className="flex flex-wrap gap-2">
-                    {cardInfo.socialMedia.map((sm) => 
-                      sm.username && (
-                        <a 
-                          key={sm.platform} 
-                          href={`https://${sm.platform}.com/${sm.username}`} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className={`flex items-center space-x-1 px-2 py-1 rounded border border-current text-current`}
+              <div className={`flex ${cardInfo.orientation === 'landscape' ? 'flex-row items-center' : 'flex-col items-start'} justify-center w-full h-full`}>
+                <div className={`flex ${cardInfo.orientation === 'landscape' ? 'flex-row items-center' : 'flex-col items-start'} ${cardInfo.orientation === 'landscape' ? 'space-x-6' : 'space-y-6'} w-full`}>
+                  <div className="flex-shrink-0 relative group">
+                    <div className="relative">
+                      <Image
+                        src={cardInfo.imageUrl || '/default-avatar.png'}
+                        alt="个人头像或公司logo"
+                        width={96}
+                        height={96}
+                        className="w-24 h-24 rounded-full object-cover"
+                      />
+                      {cardInfo.imageUrl !== '/default-avatar.png' && (
+                        <button
+                          onClick={handleImageDelete}
+                          className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          aria-label="删除图片"
                         >
-                          {sm.icon}
-                          <span>{sm.username}</span>
-                        </a>
-                      )
-                    )}
+                          <Close fontSize="small" />
+                        </button>
+                      )}
+                    </div>
+                    <button
+                      onClick={triggerImageUpload}
+                      className="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                      aria-label="更换图片"
+                    >
+                      <Edit fontSize="small" />
+                    </button>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleImageUpload}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                  </div>
+                  <div className={`flex flex-col ${cardInfo.orientation === 'portrait' ? 'text-left w-full' : ''}`}>
+                    <h2 className="text-2xl font-bold">{renderEditableField('name')}</h2>
+                    <p className="text-lg">{renderEditableField('position')}</p>
+                    <p>{renderEditableField('company')}</p>
+                    <p>{renderEditableField('email')}</p>
+                    <p>{renderEditableField('phone')}</p>
                   </div>
                 </div>
-              )}
+                {cardInfo.showSocial && (
+                  <div className={`mt-4 pt-4 border-t border-opacity-20 ${cardInfo.orientation === 'portrait' ? 'w-full' : ''}`}>
+                    <div className={`flex flex-wrap gap-2 ${cardInfo.orientation === 'portrait' ? 'justify-start' : 'justify-center'}`}>
+                      {cardInfo.socialMedia.map((sm) => 
+                        sm.username && (
+                          <a 
+                            key={sm.platform} 
+                            href={`https://${sm.platform}.com/${sm.username}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className={`flex items-center space-x-1 px-2 py-1 rounded border border-current text-current`}
+                          >
+                            {sm.icon}
+                            <span>{sm.username}</span>
+                          </a>
+                        )
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
             
             <div className="mt-4">
               <Button onClick={toggleOrientation} className="flex items-center">
                 <RotateRight className="mr-2" />
-                {t.switchOrientation}: {cardInfo.orientation === 'landscape' ? t.landscape : t.portrait}
+                {cardInfo.orientation === 'landscape' ? `${t.switchLayout}: ${t.vertical}` : `${t.switchLayout}: ${t.horizontal}`}
               </Button>
             </div>
           </div>
@@ -459,7 +487,7 @@ export function WysiwygBusinessCard() {
               </RadioGroup>
             </div>
             {cardInfo.theme === 'custom' && (
-              <div className="flex flex-wrap gap-4">
+              <>
                 <div>
                   <Label htmlFor="backgroundColor" className="font-bold">{t.backgroundColor}</Label>
                   <div className="flex items-center mt-2">
@@ -543,7 +571,17 @@ export function WysiwygBusinessCard() {
                     )}
                   </div>
                 </div>
-              </div>
+                <div>
+                  <Label htmlFor="backgroundImageUrl" className="font-bold">{t.backgroundImageUrl}</Label>
+                  <Input
+                    id="backgroundImageUrl"
+                    value={cardInfo.backgroundImageUrl}
+                    onChange={(e) => handleInputChange('backgroundImageUrl', e.target.value)}
+                    placeholder={t.backgroundImageUrl}
+                    className="mt-2"
+                  />
+                </div>
+              </>
             )}
             <div>
               <Label htmlFor="font" className="font-bold">{t.font}</Label>
@@ -585,16 +623,6 @@ export function WysiwygBusinessCard() {
                   ))}
                 </div>
               )}
-            </div>
-            <div>
-              <Label htmlFor="backgroundImageUrl" className="font-bold">背景图片链接</Label>
-              <Input
-                id="backgroundImageUrl"
-                value={cardInfo.backgroundImageUrl}
-                onChange={(e) => handleInputChange('backgroundImageUrl', e.target.value)}
-                placeholder="输入 embed gif 链接"
-                className="mt-2"
-              />
             </div>
           </div>
         </CardContent>
