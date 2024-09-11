@@ -61,7 +61,7 @@ const initialCardInfo: CardInfo = {
     { platform: 'chat', username: '', icon: <Chat fontSize="small" /> },
   ],
   orientation: 'landscape',
-  backgroundImageUrl: '/default-background.gif'
+  backgroundImageUrl: 'https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExbzFxMGJwd2lwaDhqcXFxZmNjaXVjZjk4ZjNzdnJma3k4ZmxocXJtZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/S8ZM7uiGCJVv25rrhc/giphy.gif'
 }
 
 const themeStyles: Record<CardTheme, { 
@@ -225,7 +225,7 @@ export function WysiwygBusinessCard() {
         textColor: '#333333',
         borderWidth: 2,
         borderColor: '#666666',
-        backgroundImageUrl: '/default-background.gif',
+        backgroundImageUrl: 'https://example.com/your-embed-gif.gif',
       }))
     } else {
       setCardInfo(prev => ({ 
@@ -585,6 +585,16 @@ export function WysiwygBusinessCard() {
                   ))}
                 </div>
               )}
+            </div>
+            <div>
+              <Label htmlFor="backgroundImageUrl" className="font-bold">背景图片链接</Label>
+              <Input
+                id="backgroundImageUrl"
+                value={cardInfo.backgroundImageUrl}
+                onChange={(e) => handleInputChange('backgroundImageUrl', e.target.value)}
+                placeholder="输入 embed gif 链接"
+                className="mt-2"
+              />
             </div>
           </div>
         </CardContent>
