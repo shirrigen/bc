@@ -158,7 +158,7 @@ const translations = {
     company: '公司',
     email: '邮箱',
     phone: '电话',
-    theme: '主���',
+    theme: '主题',
     backgroundColor: '背景颜色',
     textColor: '文字颜色',
     borderWidth: '边框宽度',
